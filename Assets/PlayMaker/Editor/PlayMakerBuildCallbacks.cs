@@ -21,6 +21,11 @@ namespace HutongGames.PlayMakerEditor
 
             //Debug.Log("OnPostprocessScene");
 
+            if (Application.isPlaying) // playing in editor, not really making a build
+            {
+                return;
+            }
+
             PlayMakerGlobals.IsBuilding = true;
             PlayMakerGlobals.InitApplicationFlags();
 
@@ -28,11 +33,13 @@ namespace HutongGames.PlayMakerEditor
             foreach (var playMakerFSM in fsmList)
             {
                 //Debug.Log(FsmEditorUtility.GetFullFsmLabel(playMakerFSM));
+
+#if UNITY_2018_3_OR_NEWER                
+                // TODO: we need a new build tool to process prefabs
+                if (FsmPrefabs.IsPrefab(playMakerFSM.Fsm)) continue;
+#endif
                 
-                if (!Application.isPlaying) // actually making a build vs playing in editor
-                {
-                    playMakerFSM.Preprocess();
-                }
+                playMakerFSM.Preprocess();
             }
 
             PlayMakerGlobals.IsBuilding = false;
